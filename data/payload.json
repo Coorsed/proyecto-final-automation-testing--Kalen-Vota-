@@ -1,0 +1,5 @@
+{
+    "post": {"name": "Kalen","job": "QA Developer"},
+    "put": {"name":"Kalen"},
+    "patch": {"job":"QA Developer"}
+}

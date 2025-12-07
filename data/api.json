@@ -1,0 +1,4 @@
+{
+    "api_url": "https://reqres.in/api/users",
+    "api_header": {"x-api-key": "reqres_c6e6a5cac4994545bb77271db0d7c76f"}
+}

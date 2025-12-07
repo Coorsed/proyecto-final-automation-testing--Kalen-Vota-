@@ -1,0 +1,28 @@
+2025-12-06 16:58:15 - INFO - Logger initialized and ready to use.
+2025-12-06 16:58:15 - INFO - Starting GET request test
+2025-12-06 16:58:15 - INFO - Response Status Code: 200
+2025-12-06 16:58:15 - INFO - GET request test completed successfully
+2025-12-06 16:58:15 - INFO - -----------------------------------------------------------------------------------------------------
+2025-12-06 16:58:16 - INFO - Starting POST request test
+2025-12-06 16:58:16 - INFO - Post request test completed successfully and ID was created as 55
+2025-12-06 16:58:16 - INFO - -----------------------------------------------------------------------------------------------------
+2025-12-06 16:58:16 - INFO - Starting PUT request test
+2025-12-06 16:58:17 - INFO - Response Status Code: 200
+2025-12-06 16:58:17 - INFO - {'name': 'Kalen', 'updatedAt': '2025-12-06T19:58:15.899Z'}
+2025-12-06 16:58:17 - INFO - Checking full data for verification
+2025-12-06 16:58:17 - INFO - {}
+2025-12-06 16:58:17 - INFO - PUT request test completed successfully
+2025-12-06 16:58:17 - INFO - -----------------------------------------------------------------------------------------------------
+2025-12-06 16:58:17 - INFO - Starting PATCH request test
+2025-12-06 16:58:18 - INFO - Response Status Code: 200
+2025-12-06 16:58:18 - INFO - {'job': 'QA Developer', 'updatedAt': '2025-12-06T19:58:17.058Z'}
+2025-12-06 16:58:18 - INFO - Checking full data for verification
+2025-12-06 16:58:19 - INFO - {}
+2025-12-06 16:58:19 - INFO - PATCH request test completed successfully
+2025-12-06 16:58:19 - INFO - -----------------------------------------------------------------------------------------------------
+2025-12-06 16:58:19 - INFO - Starting DELETE request test
+2025-12-06 16:58:19 - INFO - Response Status Code: 204
+2025-12-06 16:58:19 - INFO - Checking full data for verification
+2025-12-06 16:58:20 - INFO - {}
+2025-12-06 16:58:20 - INFO - DELETE request test completed successfully
+2025-12-06 16:58:20 - INFO - -----------------------------------------------------------------------------------------------------
