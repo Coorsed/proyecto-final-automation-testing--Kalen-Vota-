@@ -72,13 +72,16 @@ def pytest_runtest_makereport(item, call):
     outcome = yield
     report = outcome.get_result()
 
-    if report.when == "call" and report.failed:
+    driver = (
+        item.funcargs.get("driver")
+        or item.funcargs.get("login_in_driver")
+        or item.funcargs.get("browser")
+    )
 
-        driver = (
-            item.funcargs.get("driver")
-            or item.funcargs.get("login_in_driver")
-            or item.funcargs.get("browser")
-        )
+    if driver:
+        report.page_url = driver.current_url
+
+    if report.when == "call" and report.failed:
 
         run_dir = getattr(item.config, "run_report_dir", None)
 
@@ -88,7 +91,6 @@ def pytest_runtest_makereport(item, call):
             screenshot_path = pathlib.Path(run_dir, screenshot_name)
 
             driver.save_screenshot(str(screenshot_path))
-
 
             report.extra = getattr(report, "extra", [])
 
