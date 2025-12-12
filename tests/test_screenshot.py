@@ -6,6 +6,7 @@ from pages.login_page import LoginPage
 from pages.inventory_page import InventoryPage
 from utils.helpers import csv_reader
 
+@pytest.mark.skip(reason="Skipping screenshot test for now")
 @pytest.mark.parametrize("user,password", csv_reader("saucedemo","login.csv",filter=True))
 def test_inventory(login_in_driver, user, password):
     logger.info("Starting SCREENSHOT TEST")

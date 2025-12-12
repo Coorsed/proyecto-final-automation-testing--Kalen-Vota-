@@ -57,50 +57,46 @@ def post_id(api_url, api_header, post_payload):
 
 def pytest_configure(config):
 
-    reports_dir = pathlib.Path("reports")
-    reports_dir.mkdir(exist_ok=True)
+    reports_dir = pathlib.Path("reports") 
+    reports_dir.mkdir(exist_ok=True) 
 
-    timestamp = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
-    run_dir = pathlib.Path(reports_dir, f"run_{timestamp}")
-    run_dir.mkdir(exist_ok=True)
+    timestamp = datetime.now().strftime("%Y-%m-%d_%H-%M-%S") 
+    run_dir = pathlib.Path(reports_dir, f"run_{timestamp}") 
+    run_dir.mkdir(exist_ok=True) 
 
-    screenshots_dir = pathlib.Path(run_dir, "screenshots")
-    screenshots_dir.mkdir(exist_ok=True)
+    screenshots_dir = pathlib.Path(run_dir, "screenshots") 
+    screenshots_dir.mkdir(exist_ok=True) 
 
-    report_file = pathlib.Path(run_dir, "report.html")
-    config.option.htmlpath = str(report_file)
-    config.option.self_contained_html = False
+    report_file = pathlib.Path(run_dir, "report.html") 
+    config.option.htmlpath = str(report_file) 
+    config.option.self_contained_html = False 
 
-    config.screenshot_dir = screenshots_dir
+    config.screenshot_dir = screenshots_dir 
 
+def pytest_html_results_table_header(cells): 
+    cells.append('Screenshot') 
 
-def pytest_html_results_table_header(cells):
-
-    cells.append('Screenshot')
-
-def pytest_html_results_table_row(report, cells):
-
-    screenshot_html = getattr(report, "screenshot_html", "-")
-    cells.append(screenshot_html)
-
+def pytest_html_results_table_row(report, cells): 
+    screenshot_html = getattr(report, "screenshot_html", "-") 
+    cells.append(screenshot_html) 
 
 @pytest.hookimpl(tryfirst=True, hookwrapper=True)
 def pytest_runtest_makereport(item, call):
-    outcome = yield
-    report = outcome.get_result()
+    outcome = yield 
+    report = outcome.get_result() 
 
-    driver = item.funcargs.get("driver")
-
+    driver = item.funcargs.get("driver") 
+        
     if report.when == "call" and report.failed and driver:
-        screenshots_dir = item.config.screenshot_dir
-        file_name = screenshots_dir / f"{item.name}.png"
-        driver.save_screenshot(str(file_name))
+        screenshots_dir = item.config.screenshot_dir 
+        file_name = screenshots_dir / f"{item.name}.png" 
+        driver.save_screenshot(str(file_name)) 
 
         html_thumbnail = f"""
-        <a href="screenshots/{file_name.name}" target="_blank">
-            <img src="screenshots/{file_name.name}" style="width:120px; border:1px solid red; border-radius:5px;">
-        </a>
-        """
+        <a href="screenshots/{file_name.name}" target="_blank"> 
+            <img src="screenshots/{file_name.name}" style="width:120px; border:1px solid red; border-radius:5px;"> 
+        </a> """ 
+        
         report.screenshot_html = html_thumbnail
 
 
