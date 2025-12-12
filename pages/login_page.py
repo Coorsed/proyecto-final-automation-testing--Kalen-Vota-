@@ -6,7 +6,6 @@ import time
 
 class LoginPage:
     URL = json_reader("saucedemo","links.json","base_url")
-    
     _USER_INPUT = (By.ID, "user-name")
     _PASSWORD_INPUT = (By.ID, "password")
     _LOGIN_BUTTON = (By.ID, "login-button")
@@ -21,9 +20,7 @@ class LoginPage:
         return self
 
     def fill_user(self, user: str):
-        field = self.wait.until(
-            EC.visibility_of_element_located(self._USER_INPUT)
-        )
+        field = self.wait.until(EC.visibility_of_element_located(self._USER_INPUT))
         field.clear()
         field.send_keys(user)
         return self

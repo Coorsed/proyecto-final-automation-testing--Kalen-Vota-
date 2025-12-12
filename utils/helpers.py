@@ -30,25 +30,26 @@ def json_reader(folder_name: str, file_name: str, search_key: str):
 
 
 def csv_reader(folder_name: str, file_name: str, filter: bool | None = None):
-    inf=[]
+    results = []
     data_path = Path(__file__).parent.parent / "data" / folder_name / file_name
-    
+
     if not data_path.exists():
         raise FileNotFoundError(f"File '{file_name}' not found in 'data/{folder_name}' directory")
-    
-    with open(data_path,newline='', encoding="utf-8-sig") as f:
+
+    with open(data_path, newline='', encoding="utf-8-sig") as f:
         reader = csv.DictReader(f)
-    
+
         for row in reader:
             expected = row["expected"].lower() == "true"
 
+            # si hay filtro y no coincide → saltar
             if filter is not None and expected != filter:
                 continue
 
-            if filter is not None and expected == filter:
-                inf.append((row['user'], row['password']))
+            if filter is not None:
+                results.append((row["user"], row["password"]))
 
-            elif filter is None:
-                inf.append((row['user'], row['password'],expected))
-            
-    return inf
+            else:
+                results.append((row["user"], row["password"], expected))
+
+    return results

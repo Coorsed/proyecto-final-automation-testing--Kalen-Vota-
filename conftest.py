@@ -68,10 +68,20 @@ def pytest_configure(config):
     screenshots_dir.mkdir(exist_ok=True)
 
     report_file = pathlib.Path(run_dir, "report.html")
-    config.option.htmlpath = str(report_file) 
+    config.option.htmlpath = str(report_file)
     config.option.self_contained_html = False
 
     config.screenshot_dir = screenshots_dir
+
+
+def pytest_html_results_table_header(cells):
+
+    cells.append('Screenshot')
+
+def pytest_html_results_table_row(report, cells):
+
+    screenshot_html = getattr(report, "screenshot_html", "-")
+    cells.append(screenshot_html)
 
 
 @pytest.hookimpl(tryfirst=True, hookwrapper=True)
@@ -79,28 +89,29 @@ def pytest_runtest_makereport(item, call):
     outcome = yield
     report = outcome.get_result()
 
-    if report.when == "call" and report.failed:
-        driver = item.funcargs.get("driver")
+    driver = item.funcargs.get("driver")
 
-        if driver:
+    if report.when == "call" and report.failed and driver:
+        screenshots_dir = item.config.screenshot_dir
+        file_name = screenshots_dir / f"{item.name}.png"
+        driver.save_screenshot(str(file_name))
 
-            screenshots_dir = item.config.screenshot_dir
-            file_name = screenshots_dir / f"{item.name}.png"
-
-            driver.save_screenshot(str(file_name))
-
-            if not hasattr(report, "extra"):
-                report.extra = []
-
-            report.extra.append(extras.png(f"{file_name}"))
+        html_thumbnail = f"""
+        <a href="screenshots/{file_name.name}" target="_blank">
+            <img src="screenshots/{file_name.name}" style="width:120px; border:1px solid red; border-radius:5px;">
+        </a>
+        """
+        report.screenshot_html = html_thumbnail
 
 
-@pytest.fixture(scope="session")
+@pytest.fixture(scope="function")
 def driver():
     options = Options()
     options.add_argument("--no-sandbox")
     options.add_argument("--incognito")
     options.add_argument("--disable-dev-shm-usage")
+    options.add_argument("--log-level=3")
+    options.add_experimental_option("excludeSwitches", ["enable-logging"])
     options.add_argument("--disable-gpu")
     options.add_argument("--headless=new")
     options.add_argument("--window-size=1920,1080")
@@ -123,5 +134,5 @@ def login_in_driver(driver, user, password):
 
 
 @pytest.fixture(scope="session")
-def url_page():
+def url_base():
     return json_reader("saucedemo","links.json","base_url")
