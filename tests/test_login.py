@@ -4,7 +4,7 @@ import pytest
 from utils.logger import logger
 from utils.helpers import csv_reader
 from pages.login_page import LoginPage
-from utils.logger import logger
+
 
 @pytest.mark.parametrize("user,password,expected",csv_reader("saucedemo","login.csv"))
 def test_login(login_in_driver, user, password, expected):

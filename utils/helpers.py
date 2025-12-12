@@ -29,7 +29,7 @@ def json_reader(folder_name: str, file_name: str, search_key: str):
     return data[search_key]
 
 
-def csv_reader(folder_name: str, file_name: str):
+def csv_reader(folder_name: str, file_name: str, filter: bool | None = None):
     inf=[]
     data_path = Path(__file__).parent.parent / "data" / folder_name / file_name
     
@@ -42,5 +42,13 @@ def csv_reader(folder_name: str, file_name: str):
         for row in reader:
             expected = row["expected"].lower() == "true"
 
-            inf.append((row['user'], row['password'],expected))
+            if filter is not None and expected != filter:
+                continue
+
+            if filter is not None and expected == filter:
+                inf.append((row['user'], row['password']))
+
+            elif filter is None:
+                inf.append((row['user'], row['password'],expected))
+            
     return inf
