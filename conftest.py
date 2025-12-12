@@ -8,7 +8,11 @@ from utils.helpers import json_reader
 import pathlib
 from datetime import datetime
 from pytest_html import extras
-
+from selenium import webdriver
+from selenium.webdriver.chrome.service import Service
+from selenium.webdriver.chrome.options import Options
+from selenium.webdriver.support.ui import WebDriverWait
+from pages.login_page import LoginPage
 
 @pytest.fixture(scope="session")
 def api_url():
@@ -60,11 +64,14 @@ def pytest_configure(config):
     run_dir = pathlib.Path(reports_dir, f"run_{timestamp}")
     run_dir.mkdir(exist_ok=True)
 
-    report_file = pathlib.Path(run_dir, "report.html")
-    config.option.htmlpath = str(report_file)
-    config.option.self_contained_html = True
+    screenshots_dir = pathlib.Path(run_dir, "screenshots")
+    screenshots_dir.mkdir(exist_ok=True)
 
-    config.run_report_dir = run_dir
+    report_file = pathlib.Path(run_dir, "report.html")
+    config.option.htmlpath = str(report_file) 
+    config.option.self_contained_html = False
+
+    config.screenshot_dir = screenshots_dir
 
 
 @pytest.hookimpl(tryfirst=True, hookwrapper=True)
@@ -72,32 +79,49 @@ def pytest_runtest_makereport(item, call):
     outcome = yield
     report = outcome.get_result()
 
-    driver = (
-        item.funcargs.get("driver")
-        or item.funcargs.get("login_in_driver")
-        or item.funcargs.get("browser")
-    )
-
-    if driver:
-        report.page_url = driver.current_url
-
     if report.when == "call" and report.failed:
+        driver = item.funcargs.get("driver")
 
-        run_dir = getattr(item.config, "run_report_dir", None)
+        if driver:
 
-        if driver and run_dir:
-            timestamp = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
-            screenshot_name = f"{item.name}_{timestamp}.png"
-            screenshot_path = pathlib.Path(run_dir, screenshot_name)
+            screenshots_dir = item.config.screenshot_dir
+            file_name = screenshots_dir / f"{item.name}.png"
 
-            driver.save_screenshot(str(screenshot_path))
+            driver.save_screenshot(str(file_name))
 
-            report.extra = getattr(report, "extra", [])
+            if not hasattr(report, "extra"):
+                report.extra = []
 
-            html_thumbnail = f"""
-            <a href="{screenshot_path.name}" target="_blank">
-                <img src="{screenshot_path.name}" style="width:180px; border:1px solid #ff0000; border-radius:5px;">
-            </a>
-            """
+            report.extra.append(extras.png(f"{file_name}"))
 
-            report.extra.append(extras.html(html_thumbnail))
+
+@pytest.fixture(scope="session")
+def driver():
+    options = Options()
+    options.add_argument("--no-sandbox")
+    options.add_argument("--incognito")
+    options.add_argument("--disable-dev-shm-usage")
+    options.add_argument("--disable-gpu")
+    options.add_argument("--headless=new")
+    options.add_argument("--window-size=1920,1080")
+    service = Service()
+    driver = webdriver.Chrome(service=service, options=options)
+    driver.implicitly_wait(5)
+    yield driver
+    driver.quit()
+
+
+@pytest.fixture
+def wait(driver):
+    return WebDriverWait(driver, 10)
+
+
+@pytest.fixture
+def login_in_driver(driver, user, password):
+    LoginPage(driver).open()
+    return driver
+
+
+@pytest.fixture(scope="session")
+def url_page():
+    return json_reader("saucedemo","links.json","base_url")
